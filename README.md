@@ -3,7 +3,7 @@ Sample Socket.io project to support WebRTC applications
 
 ## Setup
 
-      npm build && npm start
+      npm run build && npm run start
 
 ## Usage Overview
 

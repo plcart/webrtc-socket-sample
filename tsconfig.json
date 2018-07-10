@@ -1,0 +1,15 @@
+{
+  "include": [
+    "./src/index.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "allowJs": true,
+    "outDir": "dist",
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "sourceMap": true,
+    "experimentalDecorators": true
+  }
+}
