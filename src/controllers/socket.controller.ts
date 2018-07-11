@@ -64,7 +64,8 @@ export class SocketController extends SocketHandler {
 
     deleteRoom(roomId: string) {
         for (const peerId in this.server.sockets.in(roomId).sockets) {
-            this.peers[peerId].socket.leave(roomId);
+            if (this.peers[peerId])
+                this.peers[peerId].socket.leave(roomId);
         }
     }
 
