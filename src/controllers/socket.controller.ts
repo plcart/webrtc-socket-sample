@@ -11,9 +11,6 @@ export class SocketController extends SocketHandler {
 
     constructor(server: io.Server) {
         super(server);
-        setInterval(() => {
-            this.notifyAvaliableUsers();
-        }, 30000);
     }
 
     notifyAvaliableUsers() {
@@ -43,7 +40,7 @@ export class SocketController extends SocketHandler {
     }
 
     private isAvailable(id: string): boolean {
-        return this.peers[id] && this.peers[id].socket.connected && Object.keys(this.peers[id].socket.rooms).length == 1;
+        return this.peers[id] && this.peers[id].socket.connected && Object.keys(this.peers[id].socket.rooms).filter(x => x != id).length == 0;
     }
 
     @SocketMethod({ event: 'ipaddr' })
@@ -60,7 +57,20 @@ export class SocketController extends SocketHandler {
 
     @SocketMethod({ event: 'bye' })
     onBye(_, client: io.Socket) {
-        client.leaveAll();
+        Object.keys(client.rooms).filter(x => x != client.id).forEach(roomId => {
+            this.deleteRoom(roomId);
+        });
+    }
+
+    deleteRoom(roomId: string) {
+        for (const peerId in this.server.sockets.in(roomId).sockets) {
+            this.peers[peerId].socket.leave(roomId);
+        }
+    }
+
+    @SocketMethod({ event: 'leave' })
+    onLeave(_, client: io.Socket) {
+        this.notifyAvaliableUsers();
     }
 
     @SocketMethod({ event: 'rtcmessage' })
@@ -90,6 +100,13 @@ export class SocketController extends SocketHandler {
         } else {
             client.emit('not-available', {})
         }
+    }
+
+    @SocketMethod({ event: 'call-cancel' })
+    onCallCancel(id: string, client: io.Socket) {
+        this.onBye(null, client);
+        const target = this.peers[id];
+        target.socket.emit('rejected')
     }
 
     @SocketMethod({ event: 'call-answered' })
