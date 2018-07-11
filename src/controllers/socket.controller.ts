@@ -102,7 +102,7 @@ export class SocketController extends SocketHandler {
         }
     }
 
-    @SocketMethod({ event: 'call-cancel' })
+    @SocketMethod({ event: 'call-canceled' })
     onCallCancel(id: string, client: io.Socket) {
         this.onBye(null, client);
         const target = this.peers[id];
